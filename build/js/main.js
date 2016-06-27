@@ -1,0 +1,1 @@
+define("app",[],function(){var n=function(){};return n.prototype={},n}),requirejs.config({baseUrl:"js",paths:{},shim:{}}),require(["app"],function(n){window.bTask=new n}),define("main",function(){});
