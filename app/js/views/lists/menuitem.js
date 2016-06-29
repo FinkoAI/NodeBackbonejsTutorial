@@ -25,7 +25,14 @@ define(
         return this;
       },
       open: function() {
-        var self = this;
+        if (bTask.views.activeListMenuItem){
+          bTask.views.activeListMenuItem.$el.removeClass("active");
+        }
+
+        //bTask.models.activeList = this.model;
+        bTask.views.activeListMenuItem = this;
+
+        this.$el.addClass("active");
         return false;
       }
     });

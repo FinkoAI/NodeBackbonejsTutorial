@@ -7,21 +7,24 @@ define(
       TaskList,
       EditListView
     ) {
-      var AddListView = EditListView.extend({
+        var AddListView = EditListView.extend({
             submit: function() {
-              var self = this;
-              var title = this.$el.find('input[name="title"]').val();
+                var self = this;
+                var title = this.$el.find('input[name="title"]').val();
 
-              this.model.save({
-                title: title
-              }, {
+                this.model.save({
+                    title: title
+                }, {
                 success: function(model) {
                   // Add the updated model to the collection
                   bTask.collections.lists.add(model);
                   self.remove();
                 }
               });
-
-              return AddListView;
             }
-          );
+        });
+
+        return AddListView;
+
+      }
+  );

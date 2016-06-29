@@ -17,9 +17,9 @@ define(
 
       initialize: function() {
         this.model.on("change", this.render, this);
-      }
+      },
 
-        render: function() {
+      render: function() {
         var $el = $(this.el);
 
         $el.html(this.template(this.model.toJSON()));

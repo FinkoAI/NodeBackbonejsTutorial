@@ -1,6 +1,5 @@
-define(["config"], function(config) {
+define(['config'], function(config) {
   var app;
-
 
   function ApiManager(_app) {
     app = _app;
@@ -12,9 +11,7 @@ define(["config"], function(config) {
   ApiManager.prototype.init = function() {
     var self = this;
 
-    gapi.client.load('tasks', 'v1', function() {
-      // Loaded
-    });
+    gapi.client.load('tasks', 'v1', function() { /* Loaded */ });
 
     function handleClientLoad() {
       gapi.client.setApiKey(config.apiKey);
@@ -22,13 +19,7 @@ define(["config"], function(config) {
     }
 
     function checkAuth() {
-      gapi.auth.authorize({
-          client_id: config.clientId,
-          scope: config.scopes,
-          immediate: false
-        },
-        handleAuthResult
-      );
+      gapi.auth.authorize({ client_id: config.clientId, scope: config.scopes, immediate: true }, handleAuthResult);
     }
 
     function handleAuthResult(authResult) {
@@ -55,12 +46,7 @@ define(["config"], function(config) {
     }
 
     this.checkAuth = function() {
-      gapi.auth.authorize({
-          client_id: config.clientId,
-          scope: config.scopes,
-          immediate: false
-        },
-        handleAuthResult);
+      gapi.auth.authorize({ client_id: config.clientId, scope: config.scopes, immediate: false }, handleAuthResult);
     };
 
     handleClientLoad();
@@ -74,41 +60,56 @@ define(["config"], function(config) {
       return this.init();
     }
 
-    require(['https://apis.google.com/js/client.js?onload=define'],
-      function() {
-        // Poll until gapi is ready
-        function checkGAPI() {
-          if (gapi && gapi.client) {
-            self.init();
-          } else {
-            setTimeout(checkGAPI, 100);
-          }
+    require(['https://apis.google.com/js/client.js?onload=define'], function() {
+      // Poll until gapi is ready
+      function checkGAPI() {
+        if (gapi && gapi.client) {
+          self.init();
+        } else {
+          setTimeout(checkGAPI, 100);
         }
+      }
 
-        checkGAPI();
-      });
+      checkGAPI();
+    });
   };
 
   Backbone.sync = function(method, model, options) {
     var requestContent = {};
     options || (options = {});
 
+    switch (model.url){
+      case "tasks":
+            requestContent.task = model.get("id");
+            break;
+      case "tasklists":
+            requestContent.tasklist = model.get("id");
+            break;
+    }
+
     switch (method) {
-      case "create":
-        requestContent["resource"] = model.toJSON();
+      case 'create':
+        requestContent['resource'] = model.toJSON();
         request = gapi.client.tasks[model.url].insert(requestContent);
         Backbone.gapiRequest(request, method, model, options);
         break;
-      case "update":
+      case 'update':
+        requestContent["resource"] = model.toJSON();
+          request = gapi.client.tasks[model.url].update(requestContent);
+          Backbone.gapiRequest(request, method, model, options);
         break;
-      case "delete":
+      case 'delete':
+        requestContent['resource'] = model.toJSON();
+        request = gapi.client.tasks[model.url].delete(requestContent);
+        Backbone.gapiRequest(request, method, model, options);
         break;
-      case "read":
-        var request = gapi.client.tasks[model.url].list(options.data);
+
+      case 'read':
+        request = gapi.client.tasks[model.url].list(options.data);
         Backbone.gapiRequest(request, method, model, options);
         break;
     }
-  }
+  };
 
   Backbone.gapiRequest = function(request, method, model, options) {
     var result;
@@ -121,11 +122,10 @@ define(["config"], function(config) {
         } else {
           result = res;
         }
-
         options.success(result, true, request);
       }
     });
   };
 
   return ApiManager;
-})
+});

@@ -21,6 +21,14 @@ define(
           model: model
         });
         this.$el.append(item.render().el);
+
+        if (!bTask.views.activeListMenuItem){
+          bTask.views.activeListMenuItem = item;
+        }
+
+        if (model.get("id") === bTask.views.activeListMenuItem.model.get("id"));{
+          item.open();
+        }
       },
 
       render: function() {

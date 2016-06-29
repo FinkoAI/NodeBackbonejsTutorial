@@ -31,6 +31,7 @@ define(
     App.prototype = {
       views: {},
       collections: {},
+      //models:{},
 
       connectGapi: function() {
         var self = this;
@@ -41,11 +42,6 @@ define(
           self.collections.lists.fetch({
             data: {
               userId: "@me"
-            },
-            success: function(res) {
-              _.each(res.models, function(model) {
-                self.views.listMenu.render();
-              });
             }
           });
         });
